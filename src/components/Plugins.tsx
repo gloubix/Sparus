@@ -2,7 +2,7 @@ import { ModuleFederation } from "@module-federation/runtime";
 import { useState, useEffect, useContext, ReactElement, ComponentType } from "react";
 import { SparusErrorContext } from "utils/Context";
 
-type PluginPosition = "header" | "body" | "footer";
+type PluginPosition = "header" | "body" | "footer" | "options";
 
 type PluginsManagerProps = {
   path: string;
@@ -28,11 +28,14 @@ export const Plugins = ({ path, register, mf }: PluginsManagerProps & { mf: Modu
 
   useEffect(() => {
     const base_url = "http://localhost:8012/plugins/";
+    // Append a cache-busting query so an updated remote plugin is fetched on
+    // launch instead of being served from the browser's HTTP cache for hours.
+    const cacheBust = `?v=${String(Date.now())}`;
     mf.registerRemotes([
       {
         name: path,
         type: "module",
-        entry: base_url + path + "/frontend.js",
+        entry: base_url + path + "/frontend.js" + cacheBust,
       },
     ]);
 
